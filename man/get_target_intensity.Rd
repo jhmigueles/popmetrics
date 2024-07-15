@@ -6,7 +6,7 @@
 \usage{
 get_target_intensity(
   data = NULL,
-  metric_name = "MaxMax5min",
+  acc_metric = "MaxMax5min",
   factor_split = c("sex"),
   factor_fit = "age",
   percentile = 80
@@ -15,13 +15,13 @@ get_target_intensity(
 \arguments{
 \item{data}{}
 
-\item{metric_name}{}
+\item{acc_metric}{}
+
+\item{factor_split}{}
 
 \item{factor_fit}{}
 
 \item{percentile}{}
-
-\item{factors_split}{}
 }
 \description{
 Title
