@@ -1,8 +1,3 @@
----
-bibliography: references.bib
-csl: biomed-central.csl
----
-
 # popmetrics
 
 <!-- badges: start -->
