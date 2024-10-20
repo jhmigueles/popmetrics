@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Calculation of Age- and Sex-Specific Cut-Points</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<style type="text/css">
+
+div.csl-bib-body { }
+div.csl-entry {
+clear: both;
+}
+.hanging div.csl-entry {
+margin-left:2em;
+text-indent:-2em;
+}
+div.csl-left-margin {
+min-width:2em;
+float:left;
+}
+div.csl-right-inline {
+margin-left:2em;
+padding-left:1em;
+}
+div.csl-indent {
+margin-left: 2em;
+}
+</style>
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Calculation of Age- and Sex-Specific
+Cut-Points</h1>
+
+
+
+<p>The R package <code>popmetrics</code> facilitates the calculation of
+age- and sex-specific cut-points for physical activity intensity
+classification based on the free-living accelerometer data recordings of
+your study sample. This methodology has been tested for first time using
+the NHANES data, specifically the first wave of accelerometer data,
+including the 2003-2004, and 2005-2006 cohorts <span class="citation">[1]</span>.</p>
+<p>No criterion measure is needed to extract the age- and sex-specific
+cut-points as they are based on the population (or study sample)
+descriptive values and their recorded free-living physical activity
+patterns.</p>
+<div id="input" class="section level2">
+<h2>Input</h2>
+<p>The expected input data that you need to get the age- and
+sex-specific cut-points consists of two main pieces. First, data
+frame(s) with epoch-level aggregation of acceleration values, and
+second, the descriptive values to be considered when fitting the
+cut-points to the population (e.g., age and sex for each participant in
+the data set).</p>
+<div id="acceleration-values" class="section level4">
+<h4>Acceleration values</h4>
+<p>There are two possibilities, either providing a single data frame
+containing the information for all the participants in the study sample,
+or providing data frames for each individual.</p>
+<ul>
+<li><p>In the first case, the user should provide the data frame as an R
+object of class data.frame or data.table containing three columns: ID,
+time stamp, and acceleration metric.</p></li>
+<li><p>In the second scenario, the user can provide the path to a folder
+containing csv or RData files for each individual. In this case,
+<code>popmetrics</code> would derive the ID from the file names by
+eliminating the file extension (e.g., <code>id001.csv</code> would
+result in <code>id001</code>). Thus, the data frames should only contain
+two columns with the time stamp and the acceleration metric.</p></li>
+</ul>
+<p>The format of the columns is expected to be as follows:</p>
+<ul>
+<li><p><strong>ID column:</strong> it can contain either character or
+numeric specification of the participants’ IDs.</p></li>
+<li><p><strong>Time stamp column:</strong> it should contain the
+beginning of each epoch either as a <code>POSIX</code>,
+<code>ISO8601</code>, or a <code>character</code> with format specified
+by the user (following the standards explained in the documentation of
+<code>base::strptime</code>.</p></li>
+<li><p><strong>Acceleration values:</strong> it should contain the
+acceleration metric that would be used in the calculation of the
+cut-points.</p></li>
+</ul>
+</div>
+<div id="descriptive-values" class="section level4">
+<h4>Descriptive values</h4>
+<p>A second data frame is expected from the user containing the
+descriptive values of the study sample. This data frame should contain a
+column with the ID, and as many columns as factors should be used in the
+calculation (e.g., ID, sex, age). It is imperative that the ID in this
+data frame exactly matches the ID extracted or specified in the
+acceleration values.</p>
+<p>A specific terminology is used for the specification of the factors
+in the <code>popmetrics</code> functions:</p>
+<ul>
+<li><p><code>factor_split</code> refers to any factor that would be used
+to split the sample before fitting the distribution of the
+accelerations. Usually, this would be a factor with not many levels
+(e.g., sex).</p></li>
+<li><p><code>factor_fit</code> refers to the factor over which the
+GAMLSS model would estimate the distribution of the acceleration metric.
+Usually, this includes a finer gradient of levels (e.g., age).</p></li>
+</ul>
+</div>
+</div>
+<div id="methodology" class="section level2">
+<h2>Methodology</h2>
+<p>The methodology for calculating the age- and sex-specific cut-points
+for moderate-to-vigorous physical activity are detailed in the study by
+Migueles et al. <span class="citation">[1]</span>, with a deeper
+explanation in the Supplemental file.</p>
+<p>In brief, the methodology consists of the following steps:</p>
+<ol style="list-style-type: decimal">
+<li><p>Calculation of the maximum 5-min intensity for each day of the
+free-living recording, inspired in the methods proposed by Rowlands et
+al. <span class="citation">[2]</span>.</p></li>
+<li><p>Extraction of the maximum value of the daily maximum 5-min
+intensity for each participant.</p></li>
+<li><p>Fitting of the maximum 5-min intensity for each participant
+across the sexes and ages using GAMLSS modelling.</p></li>
+<li><p>Definition of the target intensity as the percentile 80 of the
+maximum 5-min intensity for each age and sex.</p></li>
+<li><p>Definition of the cut-point for moderate-to-vigorous physical
+activity as the 40% of the target intensity for each age and
+sex.</p></li>
+</ol>
+</div>
+<div id="example-use-case-nhanes-03-04-cohort" class="section level2">
+<h2>Example use-case: NHANES ’03-’04 cohort</h2>
+<p>Hereby there is an example for calculation of the age and
+sex-specific cut-points as it was conducted in the proof of concept
+publication <span class="citation">[1]</span>. Loading the package allow
+access to the data and a function to facilitate some calculations.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(popmetrics)</span></code></pre></div>
+<div id="read-data-in" class="section level3">
+<h3>1. Read data in</h3>
+<p>In this tutorial, we will be using the NHANES data from 2003-2004,
+and 2005-2006. The data comes in the format of <code>.xpt</code>
+containing the data for all participants at minute level. Data is
+publicly available at <a href="https://wwwn.cdc.gov/Nchs/Nhanes/" class="uri">https://wwwn.cdc.gov/Nchs/Nhanes/</a></p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="co"># ----------------------------</span></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="co"># DOWNLOAD ACCELEROMETER DATA FROM NHANES 2003-2004:</span></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="co"># The NHANES files are ~400 MB. </span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="co"># You may need to extend the time for the download, you can do that with: </span></span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="co"># The download and reading may take some time, be patient =)</span></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="co"># ----------------------------</span></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="fu">options</span>(<span class="at">timeout =</span> <span class="dv">60</span><span class="sc">*</span><span class="dv">20</span>)</span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>temp <span class="ot">=</span> <span class="fu">tempfile</span>(<span class="at">fileext =</span> <span class="st">&quot;.zip&quot;</span>)</span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="fu">download.file</span>(<span class="at">url =</span> <span class="st">&quot;https://wwwn.cdc.gov/Nchs/Nhanes/2003-2004/PAXRAW_C.ZIP&quot;</span>,</span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>              <span class="at">destfile =</span> temp, <span class="at">mode =</span> <span class="st">&quot;wb&quot;</span>)</span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>acc_min <span class="ot">=</span> foreign<span class="sc">::</span><span class="fu">read.xport</span>(<span class="fu">unzip</span>(<span class="at">zipfile =</span> temp, <span class="at">files =</span> <span class="st">&quot;paxraw_c.xpt&quot;</span>))</span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="fu">unlink</span>(temp)</span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a><span class="co"># ----------------------------</span></span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a><span class="co"># DOWNLOAD DESCRIPTIVE DATA FROM NHANES 2003-2004:</span></span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a><span class="co"># ----------------------------</span></span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a>temp <span class="ot">=</span> <span class="fu">tempfile</span>(<span class="at">fileext =</span> <span class="st">&quot;.XPT&quot;</span>)</span>
+<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a><span class="fu">download.file</span>(<span class="at">url =</span> <span class="st">&quot;https://wwwn.cdc.gov/Nchs/Nhanes/2003-2004/DEMO_C.XPT&quot;</span>,</span>
+<span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a>              <span class="at">destfile =</span> temp, <span class="at">mode =</span> <span class="st">&quot;wb&quot;</span>)</span>
+<span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a>desc <span class="ot">=</span> foreign<span class="sc">::</span><span class="fu">read.xport</span>(temp)</span>
+<span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a><span class="fu">unlink</span>(temp)</span>
+<span id="cb2-23"><a href="#cb2-23" tabindex="-1"></a></span>
+<span id="cb2-24"><a href="#cb2-24" tabindex="-1"></a><span class="co"># ----------------------------</span></span>
+<span id="cb2-25"><a href="#cb2-25" tabindex="-1"></a><span class="co"># Note that in the published study we use data from 2003-2004, and 2005-2006.</span></span>
+<span id="cb2-26"><a href="#cb2-26" tabindex="-1"></a><span class="co"># To replicate that, download both files and rbind them.</span></span>
+<span id="cb2-27"><a href="#cb2-27" tabindex="-1"></a><span class="co"># ----------------------------</span></span></code></pre></div>
+<p>Now, <code>acc_min</code> is a data frame containing time stamp
+(columns <code>PAXHOUR</code> and <code>PAXMINUT</code>) and the
+acceleration metric (column <code>PAXINTEN</code>). In this case, the
+acceleration metric is <strong>counts per minute</strong> as derived
+from the <strong>ActiGraph 7164</strong> at that time.</p>
+</div>
+<div id="obtaining-the-age--and-sex-specific-cut-points" class="section level3">
+<h3>2. Obtaining the age- and sex-specific cut-points</h3>
+<div id="step-1---get-the-maximum-5-min-intensity-per-day" class="section level4">
+<h4>Step 1 - get the maximum 5-min intensity per day</h4>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a></span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="co"># Extract maximum 5-min intensity per day</span></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>maxDay <span class="ot">=</span> <span class="fu">aggregate</span>(PAXINTEN <span class="sc">~</span> PAXDAY <span class="sc">+</span> SEQN, <span class="at">data =</span> acc_min, <span class="at">FUN =</span> maxth,</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>                       <span class="at">k =</span> <span class="dv">5</span>, <span class="at">epoch =</span> <span class="dv">60</span>, <span class="at">consecutive =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="fu">rm</span>(acc_min) <span class="co"># no longer needed</span></span></code></pre></div>
+</div>
+<div id="step-2---clean-data-set" class="section level4">
+<h4>Step 2 - clean data set</h4>
+<p>Prior to getting the maximum value of the recording per participant,
+we need to make sure that we only fit days with valid, reliable, and
+representative data of each day. For example, we need to remove files
+without enough valid data in the recording, or files that were not
+correctly calibrated. In the example of the NHANES data:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="co"># ----------------------------</span></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="co"># Wear time indicator per day for this dataset is available as popmetrics::day_wear</span></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="co"># ----------------------------</span></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="co"># ----------------------------</span></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="co"># Keep files with:</span></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="co"># PAXCAL = 1 &amp; PAXSTAT = 1 &amp; PAXWEARMINUT &gt;= 600 (10h of wear time)</span></span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="co"># ----------------------------</span></span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>include <span class="ot">=</span> <span class="fu">which</span>(day_wear<span class="sc">$</span>PAXCAL <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> </span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>                  day_wear<span class="sc">$</span>PAXSTAT <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> </span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>                  day_wear<span class="sc">$</span>PAXWEARMINUT <span class="sc">&gt;=</span> <span class="dv">600</span>)</span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a>days2include <span class="ot">=</span> <span class="fu">paste</span>(day_wear[include,<span class="st">&quot;SEQN&quot;</span>], day_wear[include,<span class="st">&quot;PAXDAY&quot;</span>])</span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a>dayIndex <span class="ot">=</span> <span class="fu">paste</span>(maxDay[,<span class="st">&quot;SEQN&quot;</span>], maxDay[,<span class="st">&quot;PAXDAY&quot;</span>])</span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a>maxDay_clean <span class="ot">=</span> maxDay[<span class="fu">which</span>(dayIndex <span class="sc">%in%</span> days2include),]</span></code></pre></div>
+</div>
+<div id="step-3---get-the-maximum-5-min-intensity-per-each-participant" class="section level4">
+<h4>Step 3 - get the maximum 5-min intensity per each participant</h4>
+<p>Maximum observed over the days in the recording.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="co"># Keep maximum max 5-min intensity of the recording per participant</span></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>maxWeek <span class="ot">=</span> <span class="fu">aggregate</span>(PAXINTEN <span class="sc">~</span> SEQN, <span class="at">data =</span> maxDay_clean, <span class="at">FUN =</span> max)</span></code></pre></div>
+</div>
+</div>
+<div id="step-4---fit-distribution-over-the-specified-factors" class="section level3">
+<h3>Step 4 - fit distribution over the specified factors</h3>
+<p><code>factor_split</code> (sex) and <code>factor_along</code>
+(age)</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="fu">library</span>(gamlss)</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="co"># data to fit (ID, age, sex, max5intensity)</span></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>data2fit <span class="ot">=</span> <span class="fu">merge</span>(desc[, <span class="fu">c</span>(<span class="st">&quot;SEQN&quot;</span>, <span class="st">&quot;RIAGENDR&quot;</span>, <span class="st">&quot;RIDAGEYR&quot;</span>)], maxWeek, <span class="at">by =</span> <span class="st">&quot;SEQN&quot;</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a><span class="co"># GAMLSS fitted distribution for Men</span></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>distribution_men <span class="ot">=</span> <span class="fu">gamlss</span>(PAXINTEN <span class="sc">~</span> <span class="fu">cs</span>(RIDAGEYR, <span class="at">df =</span> <span class="dv">2</span>),</span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>                          <span class="at">sigma.formula =</span> <span class="sc">~</span><span class="fu">cs</span>(RIDAGEYR, <span class="at">df =</span> <span class="dv">2</span>),</span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a>                          <span class="at">nu.formula =</span> <span class="sc">~</span><span class="fu">cs</span>(RIDAGEYR,<span class="at">df=</span><span class="dv">2</span>), </span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a>                          <span class="at">family =</span> BCCG,</span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a>                          <span class="at">data =</span> <span class="fu">subset</span>(data2fit, RIAGENDR <span class="sc">==</span> <span class="dv">1</span>))</span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a></span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a><span class="co"># GAMLSS fitted distribution for Men</span></span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a>distribution_women <span class="ot">=</span> <span class="fu">gamlss</span>(PAXINTEN <span class="sc">~</span> <span class="fu">cs</span>(RIDAGEYR, <span class="at">df =</span> <span class="dv">2</span>),</span>
+<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a>                            <span class="at">sigma.formula =</span> <span class="sc">~</span><span class="fu">cs</span>(RIDAGEYR, <span class="at">df =</span> <span class="dv">2</span>),</span>
+<span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a>                            <span class="at">nu.formula =</span> <span class="sc">~</span><span class="fu">cs</span>(RIDAGEYR,<span class="at">df=</span><span class="dv">2</span>), </span>
+<span id="cb6-18"><a href="#cb6-18" tabindex="-1"></a>                            <span class="at">family =</span> BCCG,</span>
+<span id="cb6-19"><a href="#cb6-19" tabindex="-1"></a>                            <span class="at">data =</span> <span class="fu">subset</span>(data2fit, RIAGENDR <span class="sc">==</span> <span class="dv">2</span>))</span></code></pre></div>
+<div id="step-4---define-target-intensity-and-cut-points" class="section level4">
+<h4>Step 4 - Define target intensity and cut-points</h4>
+<p>Percentile 80 of the distribution and 40% of that</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="co"># men</span></span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>target_men <span class="ot">=</span> <span class="fu">centiles.pred</span>(distribution_men,</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>                           <span class="at">type =</span> <span class="st">&quot;centiles&quot;</span>, </span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>                           <span class="at">xname =</span> <span class="st">&quot;RIDAGEYR&quot;</span>, </span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>                           <span class="at">xvalues =</span>  <span class="fu">subset</span>(data2fit, RIAGENDR <span class="sc">==</span> <span class="dv">1</span>)<span class="sc">$</span>RIDAGEYR, </span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a>                           <span class="at">yval =</span> <span class="fu">subset</span>(data2fit, RIAGENDR <span class="sc">==</span> <span class="dv">1</span>)<span class="sc">$</span>PAXINTEN,</span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a>                           <span class="at">cent =</span> <span class="dv">80</span>)</span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a>years <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fu">which</span>(<span class="fu">diff</span>(target_men<span class="sc">$</span>x) <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">+</span> <span class="dv">1</span>)</span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a>target_men <span class="ot">=</span> <span class="fu">cbind</span>(target_men[years,<span class="dv">1</span>], </span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a>                    <span class="fu">round</span>(target_men[years,<span class="dv">2</span><span class="sc">:</span><span class="fu">ncol</span>(target_men)]))</span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a>target_men<span class="sc">$</span>MVPA_threshold <span class="ot">=</span> target_men[, <span class="dv">2</span>] <span class="sc">*</span> <span class="fl">0.4</span></span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a></span>
+<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a></span>
+<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a><span class="co"># women</span></span>
+<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a>target_women <span class="ot">=</span> <span class="fu">centiles.pred</span>(distribution_women,</span>
+<span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a>                             <span class="at">type =</span> <span class="st">&quot;centiles&quot;</span>, </span>
+<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a>                             <span class="at">xname =</span> <span class="st">&quot;RIDAGEYR&quot;</span>, </span>
+<span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a>                             <span class="at">xvalues =</span>  <span class="fu">subset</span>(data2fit, RIAGENDR <span class="sc">==</span> <span class="dv">2</span>)<span class="sc">$</span>RIDAGEYR, </span>
+<span id="cb7-20"><a href="#cb7-20" tabindex="-1"></a>                             <span class="at">yval =</span> <span class="fu">subset</span>(data2fit, RIAGENDR <span class="sc">==</span> <span class="dv">2</span>)<span class="sc">$</span>PAXINTEN,</span>
+<span id="cb7-21"><a href="#cb7-21" tabindex="-1"></a>                             <span class="at">cent =</span> <span class="dv">80</span>)</span>
+<span id="cb7-22"><a href="#cb7-22" tabindex="-1"></a>years <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fu">which</span>(<span class="fu">diff</span>(target_women<span class="sc">$</span>x) <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">+</span> <span class="dv">1</span>)</span>
+<span id="cb7-23"><a href="#cb7-23" tabindex="-1"></a>target_women <span class="ot">=</span> <span class="fu">cbind</span>(target_women[years,<span class="dv">1</span>], </span>
+<span id="cb7-24"><a href="#cb7-24" tabindex="-1"></a>                    <span class="fu">round</span>(target_women[years,<span class="dv">2</span><span class="sc">:</span><span class="fu">ncol</span>(target_women)]))</span>
+<span id="cb7-25"><a href="#cb7-25" tabindex="-1"></a></span>
+<span id="cb7-26"><a href="#cb7-26" tabindex="-1"></a>target_women<span class="sc">$</span>MVPA_threshold <span class="ot">=</span> target_women[, <span class="dv">2</span>] <span class="sc">*</span> <span class="fl">0.4</span></span></code></pre></div>
+</div>
+</div>
+</div>
+<div id="future-potential-applications" class="section level2">
+<h2>Future potential applications</h2>
+<p>This methodology was specifically developed for physical activity
+surveillance, yet at the moment, only one study testing this as a proof
+of concept has been published <span class="citation">[1]</span>. This R
+package has been built to facilitate further development, which will
+include the following.</p>
+<div id="other-acceleration-signal-aggregation-metrics" class="section level3">
+<h3>Other acceleration signal aggregation metrics</h3>
+<p>Preferably, the acceleration aggregation measure would be calculated
+following any of the methodologies proposed in the physical activity
+literature. Examples include (but are not limited to) ENMO <span class="citation">[3]</span>, MAD <span class="citation">[4]</span>, MIMS
+<span class="citation">[5]</span>, AI0 <span class="citation">[6]</span>, or activity counts <span class="citation">[7]</span>.</p>
+</div>
+<div id="other-data-collection-protocols" class="section level3">
+<h3>Other data collection protocols</h3>
+<p>As this methodology is specific to the acceleration patterns
+recorded, we hypothesize that it will work with study protocols
+including other acceleration brands, body attachment sites, sampling
+frequencies, among others. The only important requirement is that the
+data is representative of the usual lifestyle of the population,
+including at least 7-day long recordings.</p>
+</div>
+<div id="using-other-population-factors-to-develop-the-cut-points" class="section level3">
+<h3>Using other population factors to develop the cut-points</h3>
+<p>In the proof of concept, we used age and sex to make the cut-points
+specific to the population characteristics. Age and sex may be enough
+for the general population, yet this approach can also be adapted to
+specific factors such as socioeconomic status, weight status levels,
+physical fitness, or presence of any pathology, among others.</p>
+</div>
+</div>
+<div id="references" class="section level2 unnumbered">
+<h2 class="unnumbered">References</h2>
+<div id="refs" class="references csl-bib-body">
+<div id="ref-Migueles2024" class="csl-entry">
+1. Migueles JH, Cadenas-Sanchez C, Butera NM, Bassett DR, Wolff-Hughes
+DL, Schrack JA, et al. <a href="https://doi.org/10.1016/j.jshs.2024.100995">Development of an
+accelerometer age- and sex-specific approach based on
+population-standardized values for physical activity surveillance: A
+proof of concept</a>. Journal of Sport and Health Science. 2024;100995.
+</div>
+<div id="ref-Rowlands2018" class="csl-entry">
+2. ROWLANDS AV, EDWARDSON CL, DAVIES MJ, KHUNTI K, HARRINGTON DM, YATES
+T. <a href="https://doi.org/10.1249/mss.0000000000001561">Beyond Cut
+Points: Accelerometer Metrics that Capture the Physical Activity
+Profile</a>. Medicine &amp; Science in Sports &amp; Exercise.
+2018;50:1323–32.
+</div>
+<div id="ref-van2013" class="csl-entry">
+3. Hees VT van, Gorzelniak L, Dean León EC, Eder M, Pias M, Taherian S,
+et al. <a href="https://doi.org/10.1371/journal.pone.0061691">Separating
+Movement and Gravity Components in an Acceleration Signal and
+Implications for the Assessment of Human Daily Physical Activity</a>.
+PLoS ONE. 2013;8:e61691.
+</div>
+<div id="ref-Aittasalo2015" class="csl-entry">
+4. Aittasalo M, Vähä-Ypyä H, Vasankari T, Husu P, Jussila A-M, Sievänen
+H. <a href="https://doi.org/10.1186/s13102-015-0010-0">Mean amplitude
+deviation calculated from raw acceleration data: a novel method for
+classifying the intensity of adolescents<span>’</span> physical activity
+irrespective of accelerometer brand</a>. BMC Sports Science, Medicine
+and Rehabilitation. 2015;7.
+</div>
+<div id="ref-John2019" class="csl-entry">
+5. John D, Tang Q, Albinali F, Intille S. <a href="https://doi.org/10.1123/jmpb.2018-0068">An open-source
+monitor-independent movement summary for accelerometer data
+processing</a>. Journal for the Measurement of Physical Behaviour.
+2019;2:268–81.
+</div>
+<div id="ref-Bai2016" class="csl-entry">
+6. Bai J, Di C, Xiao L, Evenson KR, LaCroix AZ, Crainiceanu CM, et al.
+<a href="https://doi.org/10.1371/journal.pone.0160644">An Activity Index
+for Raw Accelerometry Data and Its Comparison with Other Activity
+Metrics</a>. PLOS ONE. 2016;11:e0160644.
+</div>
+<div id="ref-Neishabouri2022" class="csl-entry">
+7. Neishabouri A, Nguyen J, Samuelsson J, Guthrie T, Biggs M, Wyatt J,
+et al. <a href="https://doi.org/10.1038/s41598-022-16003-x">Quantification of
+acceleration as activity counts in ActiGraph wearable</a>. Scientific
+Reports. 2022;12.
+</div>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
