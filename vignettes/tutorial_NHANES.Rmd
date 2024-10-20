@@ -56,19 +56,6 @@ or providing data frames for each individual.
     Thus, the data frames should only contain two columns with the time
     stamp and the acceleration metric.
 
-The format of the columns is expected to be as follows:
-
--   **ID column:** it can contain either character or numeric
-    specification of the participants' IDs.
-
--   **Time stamp column:** it should contain the beginning of each epoch
-    either as a `POSIX`, `ISO8601`, or a `character` with format
-    specified by the user (following the standards explained in the
-    documentation of `base::strptime`.
-
--   **Acceleration values:** it should contain the acceleration metric
-    that would be used in the calculation of the cut-points.
-
 #### Descriptive values
 
 A second data frame is expected from the user containing the descriptive
