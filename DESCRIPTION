@@ -6,11 +6,10 @@ Authors@R:
            comment = c(ORCID = "0000-0003-0366-6935"))
 Description: Tools to derive age- and sex-specific cut-points based on accelerometer 
     population-standardized values.
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 Suggests: 
     knitr,
     rmarkdown,
@@ -20,3 +19,5 @@ VignetteBuilder: knitr
 Depends: 
     R (>= 2.10)
 LazyData: true
+Imports: 
+    lifecycle

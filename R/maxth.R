@@ -7,12 +7,16 @@
 #'
 #' @return Max th minute in the day
 #' @export
-#' @importFrom zoo rollmean
 maxth = function(x, k, epoch, consecutive = FALSE){
   k = k / (epoch/60)
   if (isFALSE(consecutive)) return(sort(x, decreasing = T)[k])
   if (isTRUE(consecutive)) {
-    x_rollmean = zoo::rollmean(x, k = k, na.rm = T)
-    return(max(x_rollmean, na.rm = T))
+    cut = length(x) %% k
+    if (cut > 0) {
+      x = x[1:(length(x) - cut)]
+    }
+    x2 = matrix(x, ncol = k, byrow = T)
+    xrollmin = apply(x2, MARGIN = 1, FUN = min, na.rm = T)
+    return(max(xrollmin, na.rm = T))
   } 
 }

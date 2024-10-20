@@ -1,13 +1,15 @@
 ---
-title: "Calculation of Age- and Sex-Specific Cut-Points (NHANES 2003-2004)"
+title: "Calculation of Age- and Sex-Specific Cut-Points"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Calculation of Age- and Sex-Specific Cut-Points (NHANES 2003-2004)}
+  %\VignetteIndexEntry{Calculation of Age- and Sex-Specific Cut-Points}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
   markdown: 
     wrap: 72
+bibliography: references.bib
+csl: biomed-central.csl
 ---
 
 ```{r, include = FALSE}
@@ -17,27 +19,25 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
-library(popmetrics)
-```
-
-## Getting ready for using popmetrics
+The R package `popmetrics` facilitates the calculation of age- and
+sex-specific cut-points for physical activity intensity classification
+based on the free-living accelerometer data recordings of your study
+sample. This methodology has been tested for first time using the NHANES
+data, specifically the first wave of accelerometer data, including the
+2003-2004, and 2005-2006 cohorts @Migueles2024.
 
 No criterion measure is needed to extract the age- and sex-specific
 cut-points as they are based on the population (or study sample)
-descriptives and their recorded free-living physical activity.
+descriptive values and their recorded free-living physical activity
+patterns.
 
-### Input
+## Input
 
-The expected input for `popmetrics` to work consists of two main pieces.
-First, data frame(s) with epoch-level aggregation of acceleration
-values, and second, the descriptive values to be considered when fitting
-the cut-points to the population.
-
-Preferably, the acceleration aggregation measure would be calculated
-following any of the methodologies proposed in the physical activity
-literature. Examples include (but are not limited to) ENMO (2), MAD (3),
-MIMS (4), AI0 (5), or activity counts (6).
+The expected input data that you need to get the age- and sex-specific
+cut-points consists of two main pieces. First, data frame(s) with
+epoch-level aggregation of acceleration values, and second, the
+descriptive values to be considered when fitting the cut-points to the
+population (e.g., age and sex for each participant in the data set).
 
 #### Acceleration values
 
@@ -83,21 +83,49 @@ the `popmetrics` functions:
 
 -   `factor_split` refers to any factor that would be used to split the
     sample before fitting the distribution of the accelerations.
-    Usually, this would be a factor with not many levels (e.g., sex or
-    weight status).
+    Usually, this would be a factor with not many levels (e.g., sex).
 
 -   `factor_fit` refers to the factor over which the GAMLSS model would
     estimate the distribution of the acceleration metric. Usually, this
     includes a finer gradient of levels (e.g., age).
 
-## Output
+## Methodology
 
-The output of `popmetrics` would be a data frame with the cut-points to
-classify moderate-to-vigorous physical activity specifically for the
-subgroups of the population that result from the application of the
-factors (`factor_split` and `factor_fit`).
+The methodology for calculating the age- and sex-specific cut-points for
+moderate-to-vigorous physical activity are detailed in the study by
+Migueles et al. @Migueles2024, with a deeper explanation in the
+Supplemental file.
 
-## Read data in
+In brief, the methodology consists of the following steps:
+
+1.  Calculation of the maximum 5-min intensity for each day of the
+    free-living recording, inspired in the methods proposed by Rowlands
+    et al. @Rowlands2018.
+
+2.  Extraction of the maximum value of the daily maximum 5-min intensity
+    for each participant.
+
+3.  Fitting of the maximum 5-min intensity for each participant across
+    the sexes and ages using GAMLSS modelling.
+
+4.  Definition of the target intensity as the percentile 80 of the
+    maximum 5-min intensity for each age and sex.
+
+5.  Definition of the cut-point for moderate-to-vigorous physical
+    activity as the 40% of the target intensity for each age and sex.
+
+## Example use-case: NHANES '03-'04 cohort
+
+Hereby there is an example for calculation of the age and sex-specific
+cut-points as it was conducted in the proof of concept publication
+@Migueles2024. Loading the package allow access to the data and a
+function to facilitate some calculations.
+
+```{r setup}
+library(popmetrics)
+```
+
+### 1. Read data in
 
 In this tutorial, we will be using the NHANES data from 2003-2004, and
 2005-2006. The data comes in the format of `.xpt` containing the data
@@ -140,9 +168,9 @@ and `PAXMINUT`) and the acceleration metric (column `PAXINTEN`). In this
 case, the acceleration metric is **counts per minute** as derived from
 the **ActiGraph 7164** at that time.
 
-## Obtaining the age- and sex-specific cut-points
+### 2. Obtaining the age- and sex-specific cut-points
 
-### Step 1 - get the maximum 5-min intensity per day
+#### Step 1 - get the maximum 5-min intensity per day
 
 ```{r eval=FALSE}
 
@@ -153,7 +181,7 @@ rm(acc_min) # no longer needed
 
 ```
 
-### Step 2 - clean data set
+#### Step 2 - clean data set
 
 Prior to getting the maximum value of the recording per participant, we
 need to make sure that we only fit days with valid, reliable, and
@@ -179,7 +207,7 @@ dayIndex = paste(maxDay[,"SEQN"], maxDay[,"PAXDAY"])
 maxDay_clean = maxDay[which(dayIndex %in% days2include),]
 ```
 
-### Step 3 - get the maximum 5-min intensity per each participant
+#### Step 3 - get the maximum 5-min intensity per each participant
 
 Maximum observed over the days in the recording.
 
@@ -217,7 +245,7 @@ distribution_women = gamlss(PAXINTEN ~ cs(RIDAGEYR, df = 2),
 
 ```
 
-### Step 4 - Define target intensity and cut-points
+#### Step 4 - Define target intensity and cut-points
 
 Percentile 80 of the distribution and 40% of that
 
@@ -251,3 +279,38 @@ target_women$MVPA_threshold = target_women[, 2] * 0.4
 
 
 ```
+
+## Future potential applications
+
+This methodology was specifically developed for physical activity
+surveillance, yet at the moment, only one study testing this as a proof
+of concept has been published @Migueles2024. This R package has been
+built to facilitate further development, which will include the
+following.
+
+### Other acceleration signal aggregation metrics
+
+Preferably, the acceleration aggregation measure would be calculated
+following any of the methodologies proposed in the physical activity
+literature. Examples include (but are not limited to) ENMO @van2013, MAD
+@Aittasalo2015, MIMS @John2019, AI0 @Bai2016, or activity counts
+@Neishabouri2022.
+
+### Other data collection protocols
+
+As this methodology is specific to the acceleration patterns recorded,
+we hypothesize that it will work with study protocols including other
+acceleration brands, body attachment sites, sampling frequencies, among
+others. The only important requirement is that the data is
+representative of the usual lifestyle of the population, including at
+least 7-day long recordings.
+
+### Using other population factors to develop the cut-points
+
+In the proof of concept, we used age and sex to make the cut-points
+specific to the population characteristics. Age and sex may be enough
+for the general population, yet this approach can also be adapted to
+specific factors such as socioeconomic status, weight status levels,
+physical fitness, or presence of any pathology, among others.
+
+## References

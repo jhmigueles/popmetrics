@@ -2,7 +2,8 @@
 % Please edit documentation in R/isNHANES.R
 \name{isNHANES}
 \alias{isNHANES}
-\title{Checks whether provided data frame is NHANES data}
+\title{Checks whether provided data frame is NHANES data
+´r lifecycle::badge('stable')´}
 \usage{
 isNHANES(df)
 }

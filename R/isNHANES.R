@@ -1,4 +1,5 @@
 #' Checks whether provided data frame is NHANES data
+#' ´r lifecycle::badge('stable')´
 #'
 #' @description
 #' Based on the column names, if SEQN, PAXHOUR, PACMINUT, and PAXINTEN are 

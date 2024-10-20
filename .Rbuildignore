@@ -1,2 +1,5 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^data/ABGB\.rda$
+^R/clean_activebrains_genobex\.R$
+^LICENSE\.md$
